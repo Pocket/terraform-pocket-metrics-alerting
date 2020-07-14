@@ -47,7 +47,8 @@ resource "aws_cloudwatch_dashboard" "dashboard" {
             key,
             val ] ]),
           # auto-inject id and expression for metric properties
-          [ merge(lookup(metric, "metadata", {}), {
+          # for stat, we basically set as follows: metadata.stat, metric.statistic, null (defer to properties.stat)
+          [ merge({stat = lookup(metric, "statistic", null)}, lookup(metric, "metadata", {}), {
             id         = lookup(metric, "id")
             expression = lookup(metric, "expression", null)
           }) ]
