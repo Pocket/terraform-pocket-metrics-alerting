@@ -26,6 +26,7 @@ resource "aws_cloudwatch_dashboard" "dashboard" {
       y          = lookup(widget, "y")
       width      = lookup(widget, "width")
       height     = lookup(widget, "height")
+      stat       = lookup(widget, "statistic", null)
       properties = merge(lookup(widget, "properties", {}), {
         # converting the dimensions key-value map into a list of alternating
         # key & value elements requires us to
@@ -37,23 +38,29 @@ resource "aws_cloudwatch_dashboard" "dashboard" {
         #
         # 1. `[ { ... } ]` (used for an expression)
         # 2. `[ "namespace", "metric", "k1", "v1", ..., {...} ]` (used for cloudwatch metric)
+        #
+        # @formatter:off
         metrics = [ for metric in lookup(widget, "metrics", [ ]):
-        flatten(concat([
-          # for expressions, these would produce `["", ""]`, which can be reduced to []
-          compact([
-            lookup(metric, "namespace", ""),
-            lookup(metric, "metric", "") ]),
-          flatten([ for key, val in lookup(metric, "dimensions", {}): [
-            key,
-            val ] ]),
-          # auto-inject id and expression for metric properties
-          # for stat, we basically set as follows: metadata.stat, metric.statistic, null (defer to properties.stat)
-          [ merge({stat = lookup(metric, "statistic", null)}, lookup(metric, "metadata", {}), {
-            id         = lookup(metric, "id")
-            expression = lookup(metric, "expression", null)
-          }) ]
-        ]))
+          flatten(concat([
+            # for expressions, these would produce `["", ""]`, which can be reduced to []
+            compact([
+              lookup(metric, "namespace", ""),
+              lookup(metric, "metric", "")
+            ]),
+            flatten([ for key, val in lookup(metric, "dimensions", {}): [ key, val ] ]),
+            # auto-inject id and expression for metric properties
+            # for stat, we basically set as follows: metadata.stat, metric.statistic, null (defer to properties.stat)
+            [ merge(
+#                { stat = lookup(metric, "statistic", null) },
+                lookup(metric, "metadata", {}),
+                {
+                  id         = lookup(metric, "id")
+                  expression = lookup(metric, "expression", null)
+                }
+            ) ]
+          ]))
         ]
+        # @formatter:on
       })
     }
     ]

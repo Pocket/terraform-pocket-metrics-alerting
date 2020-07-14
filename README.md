@@ -59,6 +59,7 @@ Widgets are plotted on a grid with 24 vertical units. Widgets can be as narrow a
 | `width` **req**      | number   | between `[1, 24]`                       |
 | `height` **req**     | number   |                                         |
 | `metrics` **req**    | metric[] |                                         |
+| `stat` **req**       | string   |                                         |
 | `properties` **req** | map(any) |                                         |
 | — `.title` **req**   | string   |                                         |
 | — `.stacked` **req** | boolean  |                                         |
