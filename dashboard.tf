@@ -37,16 +37,17 @@ resource "aws_cloudwatch_dashboard" "dashboard" {
             lookup(metric, "namespace", ""),
             lookup(metric, "metric", "")
           ]),
+          # unzip map
           flatten([ for key, val in lookup(metric, "dimensions", {}): [ key, val ] ]),
           # auto-inject id and expression for metric properties
           # for stat, we basically set as follows: metadata.stat, metric.statistic, null (defer to properties.stat)
           [ merge(
-          #                { stat = lookup(metric, "statistic", null) },
-          lookup(metric, "metadata", {}),
-          {
-            id         = lookup(metric, "id")
-            expression = lookup(metric, "expression", null)
-          }
+            { stat = lookup(metric, "statistic", null) },
+            lookup(metric, "metadata", {}),
+            {
+              id         = lookup(metric, "id")
+              expression = lookup(metric, "expression", null)
+            }
           ) ]
         ]))
         ]
