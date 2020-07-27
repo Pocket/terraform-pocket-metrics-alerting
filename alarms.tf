@@ -22,14 +22,14 @@ locals {
     query_expressions = compact(flatten([
     for i, met in lookup(alarm, "metrics"): [
       lookup(met, "expression", null) == null ?
-      null : jsonencode(merge(met, lookup(met, "metadata"))) ]
+      null : jsonencode(merge(met, lookup(met, "metadata", {}))) ]
     ]))
 
     # isolate cloudwatch metrics
     query_metrics = compact(flatten([
     for i, met in lookup(alarm, "metrics"): [
       lookup(met, "expression", null) == null ?
-      jsonencode(merge(met, lookup(met, "metadata"))) : null ]
+      jsonencode(merge(met, lookup(met, "metadata", {}))) : null ]
     ]))
   })
   }
