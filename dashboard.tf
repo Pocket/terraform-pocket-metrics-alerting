@@ -20,12 +20,13 @@ resource "aws_cloudwatch_dashboard" "dashboard" {
     widgets = [
     for widget in lookup(each.value, "widgets", [ ]):
     {
-      type       = "metric"
+      type       = lookup(widget, "type", "metric")
       x          = lookup(widget, "x")
       y          = lookup(widget, "y")
       width      = lookup(widget, "width")
       height     = lookup(widget, "height")
       properties = merge(lookup(widget, "properties", {}), {
+        alarms   = lookup(widget, "alarms", null)
         # converting the dimensions key-value map into a list of alternating
         # key & value elements requires us to
         #
@@ -38,7 +39,7 @@ resource "aws_cloudwatch_dashboard" "dashboard" {
         # 2. `[ "namespace", "metric", "k1", "v1", ..., {...} ]` (used for cloudwatch metric)
         #
         # @formatter:off
-        metrics = [ for metric in lookup(widget, "metrics", [ ]):
+        metrics = [ for metric in lookup(widget, "metrics", []):
         flatten(concat([
           # for expressions, these would produce `["", ""]`, which can be reduced to []
           compact([
